@@ -32,14 +32,17 @@ public class User {
     
     @Column(length = 64)
     private String photo;
-    
+   
+
     // Agent-specific fields
     @Column(name = "license_number", length = 50)
     private String licenseNumber;
     
     @Column(name = "phone_number", length = 20)  // Changed to String and increased length
     private String phoneNumber;  // Changed to String and camelCase naming
-    
+    @Column(length = 255)
+    private String address;
+
     @Column(columnDefinition = "TEXT")
     private String differentiation;
     
@@ -58,12 +61,20 @@ public class User {
         // Automatically set the current date and time before persisting
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    @Column(name = "is_approved", nullable = false)
+    private boolean isApproved = true; 
 
     // -----------------------------------------------------------------------
    // Active or Disabled status field
    @Column(name = "is_active", nullable = false)
    private boolean isActive = true; // Default to active
-//    --------------------------------------------------
+  // Reason for enabling the user
+  @Column(name = "enable_reason")
+  private String enableReason;
+   // Disable reason field (Newly added)
+ @Column(name = "disable_reason")
+ private String disableReason;
+   //    --------------------------------------------------
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
     joinColumns = @JoinColumn(name = "user_id"),
@@ -163,9 +174,27 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    public String getAddress() {
+        return address;
+    }
+    
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
 // -----------------------------------------------------
 // Getter and Setter for isActive
 public boolean isActive() { return isActive; }
 public void setActive(boolean isActive) { this.isActive = isActive; }
-
+public boolean isApproved() {
+    return isApproved;
+}
+public void setApproved(boolean approved) {
+    isApproved = approved;
+}
+ // Getter and Setter for disableReason (New field)
+ public String getDisableReason() { return disableReason; }
+ public void setDisableReason(String disableReason) { this.disableReason = disableReason; }
+ public String getEnableReason() { return enableReason; }
+ public void setEnableReason(String enableReason) { this.enableReason = enableReason; }
 }
