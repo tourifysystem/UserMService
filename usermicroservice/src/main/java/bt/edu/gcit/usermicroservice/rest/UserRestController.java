@@ -40,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity; // 
 import bt.edu.gcit.usermicroservice.service.ForgotpasswordService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -250,6 +251,38 @@ public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> req
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match or email is invalid.");
     }
 }
+// @PostMapping("/login")
+// public ResponseEntity<?> login(@RequestBody User loginRequest) {
+//     // Authenticate the user using email and password
+//     User authenticatedUser = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+
+//     if (authenticatedUser != null) {
+//         // Extract role IDs and names
+//         Set<Integer> roleIds = authenticatedUser.getRoles().stream()
+//                 .map(role -> role.getId())  // Assuming Role has getId()
+//                 .collect(Collectors.toSet());
+
+//         Set<String> roleNames = authenticatedUser.getRoles().stream()
+//                 .map(role -> role.getName().toLowerCase())  // Assuming Role has getName()
+//                 .collect(Collectors.toSet());
+
+//         // Generate JWT token using user's email
+//         String token = jwtUtil.generateToken(authenticatedUser.getEmail());
+
+//         // Prepare response payload
+//         Map<String, Object> response = new HashMap<>();
+//         response.put("token", token);
+//         response.put("user", authenticatedUser);
+//         response.put("roleIds", roleIds);
+//         response.put("roleNames", roleNames);
+
+//         return ResponseEntity.ok(response);
+//     } else {
+//         // Return 401 if authentication fails
+//         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                 .body("Invalid email or password.");
+//     }
+// }
 @PostMapping("/login")
 public ResponseEntity<?> login(@RequestBody User loginRequest) {
     // Authenticate the user using email and password
@@ -265,13 +298,13 @@ public ResponseEntity<?> login(@RequestBody User loginRequest) {
                 .map(role -> role.getName().toLowerCase())  // Assuming Role has getName()
                 .collect(Collectors.toSet());
 
-        // Generate JWT token using user's email
-        String token = jwtUtil.generateToken(authenticatedUser.getEmail());
+        // Generate JWT token using user's email and userId
+        String token = jwtUtil.generateToken(authenticatedUser.getEmail(), authenticatedUser.getId());
 
         // Prepare response payload
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
-        response.put("user", authenticatedUser);
+        response.put("user", authenticatedUser);  // You can use a DTO to avoid exposing sensitive data
         response.put("roleIds", roleIds);
         response.put("roleNames", roleNames);
 
@@ -282,6 +315,7 @@ public ResponseEntity<?> login(@RequestBody User loginRequest) {
                 .body("Invalid email or password.");
     }
 }
+
 
   // Endpoint for admin to approve an agent
   @PutMapping("/approve-agent/{agentId}")
@@ -415,5 +449,18 @@ public ResponseEntity<Long> countAgents() {
     long count = userService.countAgents();
     return ResponseEntity.ok(count);
 }
+@GetMapping("/tourists-by-country")
+public ResponseEntity<List<Map<String, Object>>> getTouristsByCountry() {
+    List<Object[]> result = userService.getTouristCountByCountry();
+    List<Map<String, Object>> response = new ArrayList<>();
 
+    for (Object[] row : result) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("country", row[0]);
+        map.put("count", row[1]);
+        response.add(map);
+    }
+
+    return ResponseEntity.ok(response);
+}
 }

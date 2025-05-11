@@ -34,5 +34,5 @@ boolean disableUser(Long userId, String reason);
  long countAdmins();
  long countTourists();
  long countAgents();
- 
+ List<Object[]> getTouristCountByCountry();
 }

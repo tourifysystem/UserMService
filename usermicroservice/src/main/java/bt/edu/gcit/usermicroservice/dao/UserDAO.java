@@ -23,5 +23,6 @@ public interface UserDAO{
  long countAdmins();
 long countTourists();
 long countAgents();
+List<Object[]> countTouristsByCountry();
 
 }

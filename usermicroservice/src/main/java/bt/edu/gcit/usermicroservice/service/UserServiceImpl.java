@@ -696,6 +696,9 @@ public long countTourists() {
 public long countAgents() {
     return userDAO.countAgents();
 }
-
+@Override
+    public List<Object[]> getTouristCountByCountry() {
+        return userDAO.countTouristsByCountry();
+    }
     
 }

@@ -1,57 +1,4 @@
 
-// package bt.edu.gcit.usermicroservice.security;
-
-// import io.jsonwebtoken.Jwts;
-// import io.jsonwebtoken.SignatureAlgorithm;
-// import io.jsonwebtoken.security.Keys;
-// import org.springframework.security.core.GrantedAuthority;
-// import org.springframework.stereotype.Component;
-
-// import javax.crypto.SecretKey;
-// import java.util.Collection;
-// import java.util.Date;
-
-// @Component
-// public class JwtUtil {
-
-//     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-//     private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour in milliseconds
-
-//     public String generateToken(String username) {
-//         return Jwts.builder()
-//                 .setSubject(username)
-//                 .setIssuedAt(new Date())
-//                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-//                 .signWith(SECRET_KEY)
-//                 .compact();
-//     }
-
-//     public String extractUsername(String token) {
-//         return Jwts.parserBuilder()
-//                 .setSigningKey(SECRET_KEY)
-//                 .build()
-//                 .parseClaimsJws(token)
-//                 .getBody()
-//                 .getSubject();
-//     }
-
-//     public boolean isTokenExpired(String token) {
-//         return extractExpirationDate(token).before(new Date());
-//     }
-
-//     private Date extractExpirationDate(String token) {
-//         return Jwts.parserBuilder()
-//                 .setSigningKey(SECRET_KEY)
-//                 .build()
-//                 .parseClaimsJws(token)
-//                 .getBody()
-//                 .getExpiration();
-//     }
-
-//     public boolean validateToken(String token, String username) {
-//         return (username.equals(extractUsername(token)) && !isTokenExpired(token));
-//     }
-// }
 package bt.edu.gcit.usermicroservice.security;
 
 import io.jsonwebtoken.Jwts;
@@ -79,15 +26,25 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    // Generate JWT token
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
+    // // Generate JWT token
+    // public String generateToken(String username) {
+    //     return Jwts.builder()
+    //             .setSubject(username)
+    //             .setIssuedAt(new Date())
+    //             .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+    //             .signWith(secretKey, SignatureAlgorithm.HS256)
+    //             .compact();
+    // }
+// Generate JWT token with userId as a claim
+public String generateToken(String username, Long userId) {
+    return Jwts.builder()
+            .setSubject(username)
+            .claim("userId", userId)  // Add userId as a claim
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+            .signWith(secretKey, SignatureAlgorithm.HS256)
+            .compact();
+}
 
     // Extract username (subject) from token
     public String extractUsername(String token) {
@@ -97,6 +54,15 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+       // Extract userId from token
+       public Long extractUserId(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId", Long.class);  // Extract userId as Long
     }
 
     // Check if token is expired

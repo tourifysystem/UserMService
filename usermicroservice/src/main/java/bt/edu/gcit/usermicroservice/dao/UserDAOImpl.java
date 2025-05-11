@@ -196,5 +196,13 @@ public long countAgents() {
     String jpql = "SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.id = 3";
     return entityManager.createQuery(jpql, Long.class).getSingleResult();
 }
+@Override
+public List<Object[]> countTouristsByCountry() {
+    String jpql = "SELECT u.country, COUNT(u) " +
+                  "FROM User u JOIN u.roles r " +
+                  "WHERE r.id = 2 AND u.deleted = false AND u.country IS NOT NULL " +
+                  "GROUP BY u.country";
+    return entityManager.createQuery(jpql, Object[].class).getResultList();
+}
 
 }
